@@ -1,0 +1,34 @@
+{
+  "name": "api-arq",
+  "version": "0.0.1",
+  "description": "api-test",
+  "type": "module",
+  "main": "./src/app.js",
+  "scripts": {
+    "dev": "nodemon /src/app.js"
+  },
+  "keywords": [
+    "javascript",
+    "auth",
+    "jwt"
+  ],
+  "author": "Diego Quintana <diegoquinfa@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.11.3",
+    "valibot": "^0.29.0"
+  }
+}
