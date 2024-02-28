@@ -1,0 +1,272 @@
+openapi: 3.0.3
+info:
+  title: Ejemplo de arquitectura - API v1
+  description: |-
+    Aplicación de prueba de concepto de 
+    arquitectura de software, La arquitectura 
+    de servicios implementada para la aplicación 
+    web "PLANNI" se basa en principios de 
+    modularidad, escalabilidad y mantenibilidad. 
+    Desarrollada con Node.js y Express, 
+    consta de cuatro capas interrelacionadas: 
+    Configuración, Red, Componentes y Datos.
+
+    **Se divide en:**
+
+    1. **Capa de configuración:**
+
+        Esta capa constituye la entrada de la 
+        aplicación y se encarga de la 
+        configuración del servidor Express. 
+        Aquí se definen las variables de entorno,
+        la inicialización del servidor y la 
+        conexión con otros servicios externos 
+        si fuera necesario.
+
+    2. **Capa de red:**
+      Esta capa se subdivide en dos partes:
+      
+          - **routes.js**: Encargada de
+            administrar los endpoints de la
+            aplicación. Define las rutas HTTP
+            y vincula cada ruta con su
+            correspondiente controlador. Esto
+            asegura una gestión clara y
+            organizada de las solicitudes
+            entrantes.
+
+          - **response.js**: Responsable de
+            estandarizar las respuestas
+            generadas por los componentes de
+            la aplicación. Esta parte garantiza
+            coherencia en la estructura y
+            formato de las respuestas enviadas
+            al cliente, facilitando así la
+            interoperabilidad y la experiencia
+            del usuario.
+
+    3. **Capa de componentes:**
+        Los componentes representan las
+        entidades fundamentales de la aplicación,
+        como usuarios, autenticación, vuelos,
+        hoteles, entre otros. Cada componente se
+        divide en dos partes:
+
+          - **Capa de Net**: Administra las URIs
+            de los endpoints correspondientes
+            a cada componente. Define los
+            métodos HTTP permitidos y 
+            vincula estas rutas con la funciones
+            controladoras adecuadas.
+
+          - **Capa de Controlador**: Contiene la
+            lógica de negocio específica de
+            cada componente. Aquí se
+            procesan las solicitudes entrantes,
+            se interactúa con la capa de datos y
+            se genera la respuesta correspondiente 
+            para ser enviada de vuelta a la capa 
+            de red.
+
+
+    4. **Capa de datos:**
+        Esta capa gestiona la interacción con la
+        base de datos mediante inyección de
+        dependencias. Su objetivo es abstracción
+        sobre el almacenamiento de datos,
+        permitiendo así una fácil migración entre
+        sistemas de gestión de bases de datos si es
+        necesario.
+
+
+    # JsonWebToken de prueba:
+        eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEiLCJuYW1lIjoiRGllZ28gUXVpbnRhbmEifQ.QNYEl1WcveQrL1vtLAuQIwuLvObN90drx9HW0Z6F7OM
+
+
+  license:
+    name: MIT License
+    url: https://opensource.org/license/mit/
+  version: 0.0.1
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local develepment
+tags:
+  - name: users
+    description: Operations about user
+  - name: seeds
+    description: Init db
+
+paths:
+  /seeds:
+    get:
+      tags:
+        - seeds
+      summary: Init the database of docker
+      operationId: createDatabase
+      responses:
+        default:
+          description: successful operation
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Init db
+              
+  /users:
+    post:
+      tags:
+        - users
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      parameters:
+        - name: authorization
+          in: header
+          description: Token de autorización JWT
+          required: true
+          schema:
+            type: string
+        
+      requestBody:
+        description: Created user object
+        headers:
+          authorization:
+            description: date in UTC when token expires
+            schema:
+              type: string
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUser'
+      responses:
+          '201':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponseCreateUser'
+          '400':
+            description: bad request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ApiResponseCreateUserBad'
+                
+
+  /users/{id}:
+    get:
+      tags:
+        - users
+      summary: Get user by user id
+      description: ''
+      operationId: getUserById
+      parameters:
+        - name: id
+          in: path
+          description: 'The id that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+        - in: header
+          name: authorization
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponseCreateUser'          
+        '400':
+          description: Invalid id supplied
+        '401':
+          description: Unauthorized
+        '404':
+          description: User not found
+    
+components:
+  schemas:   
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 6
+        name:
+          type: string
+          example: Isaac Zuñiga
+        email:
+          type: string
+          example: isaacz@email.com
+        password:
+          type: string
+          example: '123456'
+
+    CreateUser:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Isaac Zuñiga
+        email:
+          type: string
+          example: isaacz@email.com
+        password:
+          type: string
+          example: '123456'
+    
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: bool
+          example: true
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+
+    ApiResponseCreateUser:
+      type: object
+      properties:
+        success:
+          type: bool
+          example: true
+        message:
+          type: string
+          example: Create user success
+        data:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Isaac Zuñiga
+            email:
+              type: string
+              example: isaacz@email.com
+            password:
+              type: string
+              example: '123456'
+        status:
+          type: integer
+          format: int32
+          example: 200
+    ApiResponseCreateUserBad:
+      type: object
+      properties:
+        success:
+          type: bool
+          example: false
+        message:
+          type: string
+          example: Email alredy exists
+        status:
+          type: integer
+          format: int32
+          example: 400
+
+
